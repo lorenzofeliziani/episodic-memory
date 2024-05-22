@@ -1,4 +1,4 @@
-"""VSLNet Baseline for Ego4D Episodic Memory -- Natural Language Queries.
+"""VSLBase Baseline for Ego4D Episodic Memory -- Natural Language Queries.
 """
 import torch
 import torch.nn as nn
@@ -133,11 +133,6 @@ class VSLNet(nn.Module):
     def extract_index(self, start_logits, end_logits):
         return self.predictor.extract_index(
             start_logits=start_logits, end_logits=end_logits
-        )
-
-    def compute_highlight_loss(self, scores, labels, mask):
-        return self.highlight_layer.compute_loss(
-            scores=scores, labels=labels, mask=mask
         )
 
     def compute_loss(self, start_logits, end_logits, start_labels, end_labels):
