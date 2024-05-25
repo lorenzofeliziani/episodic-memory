@@ -59,7 +59,7 @@ def convert_length_to_mask(lengths):
     return mask
 
 
-def eval_test_base(
+def eval_test(
     model,
     data_loader,
     device,
@@ -96,96 +96,6 @@ def eval_test_base(
             video_mask = convert_length_to_mask(vfeat_lens).to(device)
             # compute predicted results
             start_logits, end_logits = model(
-                word_ids, char_ids, vfeats, video_mask, query_mask
-            )
-            start_indices, end_indices = model.extract_index(start_logits, end_logits)
-            start_indices = start_indices.cpu().numpy()
-            end_indices = end_indices.cpu().numpy()
-
-            # Record output and use standard evalution script for NLQ.
-            for record, starts, ends in zip(records, start_indices, end_indices):
-                # Convert all indices to times.
-                timewindow_predictions = []
-                for start, end in zip(starts, ends):
-                    start_time, end_time = index_to_time(
-                        start, end, record["v_len"], record["duration"]
-                    )
-                    timewindow_predictions.append([float(start_time), float(end_time)])
-                new_datum = {
-                    "clip_uid": record["vid"],
-                    "annotation_uid": record["annotation_uid"],
-                    "query_idx": int(record["query_idx"]),
-                    "predicted_times": copy.deepcopy(timewindow_predictions),
-                }
-                predictions.append(new_datum)
-
-    # Save predictions if path is provided.
-    if result_save_path:
-        with open(result_save_path, "w") as file_id:
-            json.dump(
-                {
-                    "version": "1.0",
-                    "challenge": "ego4d_nlq_challenge",
-                    "results": predictions,
-                }, file_id
-            )
-
-    # Evaluate if ground truth JSON file is provided.
-    if gt_json_path:
-        with open(gt_json_path) as file_id:
-            ground_truth = json.load(file_id)
-        thresholds = [0.3, 0.5, 0.01]
-        topK = [1, 3, 5]
-        results, mIoU = ego4d_eval.evaluate_nlq_performance(
-            predictions, ground_truth, thresholds, topK
-        )
-        title = f"Epoch {epoch}, Step {global_step}"
-        display_results = ego4d_eval.display_results(
-            results, mIoU, thresholds, topK, title=title
-        )
-    else:
-        results = None
-        mIoU = None
-        display_results = None
-    return results, mIoU, display_results
-
-def eval_test_net(
-    model,
-    data_loader,
-    device,
-    mode="test",
-    result_save_path=None,
-    gt_json_path=None,
-    epoch=None,
-    global_step=None,
-):
-    predictions = []
-    with torch.no_grad():
-        for idx, (records, vfeats, vfeat_lens, word_ids, char_ids) in tqdm(
-            enumerate(data_loader),
-            total=len(data_loader),
-            desc="evaluate {}".format(mode),
-        ):
-            # prepare features
-            vfeats, vfeat_lens = vfeats.to(device), vfeat_lens.to(device)
-
-            if isinstance(word_ids, dict):
-                word_ids = {key: val.to(device) for key, val in word_ids.items()}
-                # generate mask
-                query_mask = (
-                    (torch.zeros_like(word_ids["input_ids"]) != word_ids["input_ids"])
-                    .float()
-                    .to(device)
-                )
-            else:
-                word_ids, char_ids = word_ids.to(device), char_ids.to(device)
-                # generate mask
-                query_mask = (torch.zeros_like(word_ids) != word_ids).float().to(device)
-
-            # generate mask
-            video_mask = convert_length_to_mask(vfeat_lens).to(device)
-            # compute predicted results
-            _, start_logits, end_logits = model(
                 word_ids, char_ids, vfeats, video_mask, query_mask
             )
             start_indices, end_indices = model.extract_index(start_logits, end_logits)
