@@ -79,6 +79,57 @@ def reformat_data_new(split_data, test_split=False):
         formatted_data[video_uid] = new_dict
     return formatted_data, clip_video_map
 
+def reformat_data(split_data, test_split=False):
+    """Convert the format from JSON files.
+    fps, num_frames, timestamps, sentences, exact_times,
+    annotation_uids, query_idx.
+    """
+    formatted_data = {}
+    clip_video_map = {}
+    for video_datum in split_data["videos"]:
+        for clip_datum in video_datum["clips"]:
+            clip_uid = clip_datum["clip_uid"]
+            clip_video_map[clip_uid] = (
+                video_datum["video_uid"],
+                clip_datum["video_start_sec"],
+                clip_datum["video_end_sec"],
+            )
+            clip_duration = clip_datum["video_end_sec"] - clip_datum["video_start_sec"]
+            num_frames = get_nearest_frame(clip_duration, math.ceil)
+            new_dict = {
+                "fps": FEATURES_PER_SEC,
+                "num_frames": num_frames,
+                "timestamps": [],
+                "exact_times": [],
+                "sentences": [],
+                "annotation_uids": [],
+                "query_idx": [],
+            }
+
+            for ann_datum in clip_datum["annotations"]:
+                for index, datum in enumerate(ann_datum["language_queries"]):
+                    if not test_split:
+                        start_time = float(datum["clip_start_sec"])
+                        end_time = float(datum["clip_end_sec"])
+                    else:
+                        # Random placeholders for test set.
+                        start_time = 0.
+                        end_time = 0.
+
+                    if "query" not in datum or not datum["query"]:
+                        continue
+                    new_dict["sentences"].append(process_question(datum["query"]))
+                    new_dict["annotation_uids"].append(ann_datum["annotation_uid"])
+                    new_dict["query_idx"].append(index)
+                    new_dict["exact_times"].append([start_time, end_time]),
+                    new_dict["timestamps"].append(
+                        [
+                            get_nearest_frame(start_time, math.floor),
+                            get_nearest_frame(end_time, math.ceil),
+                        ]
+                    )
+            formatted_data[clip_uid] = new_dict
+    return formatted_data, clip_video_map
 
 def convert_ego4d_dataset(args):
     """Convert the Ego4D dataset for VSLNet."""
@@ -91,6 +142,8 @@ def convert_ego4d_dataset(args):
             raw_data = json.load(file_id)
         if split == "train":
             data_split, clip_video_map = reformat_data_new(raw_data, split == "test")
+        else:
+            data_split, clip_video_map = reformat_data(raw_data, split == "test")
         all_clip_video_map.update(clip_video_map)
         num_instances = sum(len(ii["sentences"]) for ii in data_split.values())
         print(f"# {split}: {num_instances}")
