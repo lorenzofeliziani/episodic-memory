@@ -31,7 +31,7 @@ def process_question(question):
     return question.strip(" ").strip("?").lower() + "?"
 
 
-def reformat_data(split_data, test_split=False):
+def reformat_data_new(split_data, test_split=False):
     """Convert the format from JSON files.
     fps, num_frames, timestamps, sentences, exact_times, query_idx.
     """
@@ -89,7 +89,8 @@ def convert_ego4d_dataset(args):
         print(f"Reading [{split}]: {read_path}")
         with open(read_path, "r") as file_id:
             raw_data = json.load(file_id)
-        data_split, clip_video_map = reformat_data(raw_data, split == "test")
+        if split == "train":
+            data_split, clip_video_map = reformat_data_new(raw_data, split == "test")
         all_clip_video_map.update(clip_video_map)
         num_instances = sum(len(ii["sentences"]) for ii in data_split.values())
         print(f"# {split}: {num_instances}")
