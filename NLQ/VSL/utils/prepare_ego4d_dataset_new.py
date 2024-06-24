@@ -33,8 +33,7 @@ def process_question(question):
 
 def reformat_data(split_data, test_split=False):
     """Convert the format from JSON files.
-    fps, num_frames, timestamps, sentences, exact_times,
-    annotation_uids, query_idx.
+    fps, num_frames, timestamps, sentences, exact_times, query_idx.
     """
     formatted_data = {}
     clip_video_map = {}
@@ -53,8 +52,7 @@ def reformat_data(split_data, test_split=False):
             "timestamps": [],
             "exact_times": [],
             "sentences": [],
-            "annotation_uids": [],
-            "query_idx": [],
+            "query_idx": []
         }
 
         for ann_datum in video_datum["annotations"]:
@@ -70,7 +68,6 @@ def reformat_data(split_data, test_split=False):
                 if "query" not in datum or not datum["query"]:
                     continue
                 new_dict["sentences"].append(process_question(datum["query"]))
-                new_dict["annotation_uids"].append(ann_datum["annotation_uid"])
                 new_dict["query_idx"].append(index)
                 new_dict["exact_times"].append([start_time, end_time]),
                 new_dict["timestamps"].append(
