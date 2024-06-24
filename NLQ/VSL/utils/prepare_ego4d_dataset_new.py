@@ -160,6 +160,8 @@ def convert_ego4d_dataset(args):
     progress_bar = tqdm.tqdm(all_clip_video_map.items(), desc="Extracting features")
     for clip_uid, (video_uid, start_sec, end_sec) in progress_bar:
         print(video_uid)
+    for clip_uid, (video_uid, start_sec, end_sec) in progress_bar:
+        print(video_uid)
         feature_path = os.path.join(args["video_feature_read_path"], f"{video_uid}.pt")
         feature = torch.load(feature_path)
 
