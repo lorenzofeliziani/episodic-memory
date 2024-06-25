@@ -102,6 +102,11 @@ def main(configs, parser):
             configs=configs, word_vectors=dataset.get("word_vector", None)
         ).to(device)
         optimizer, scheduler = build_optimizer_and_scheduler(model, configs=configs)
+        if configs.pretrained.lower()=='true':
+            checkpoint = torch.load(configs.pretrain_path)
+            model.load_state_dict(checkpoint['model_state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         # start training
         best_metric = -1.0
         score_writer = open(
