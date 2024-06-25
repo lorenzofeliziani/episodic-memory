@@ -46,7 +46,7 @@ class EpisodicNLQProcessor:
                 data_item["sentences"],
                 data_item["query_idx"],
             )
-            for timestamp, exact_time, sentence, ann_uid, query_idx in zipper:
+            for timestamp, exact_time, sentence, query_idx in zipper:
                 start_time = max(0.0, float(timestamp[0]) / fps)
                 end_time = min(float(timestamp[1]) / fps, duration)
                 if self._predictor != "bert":
@@ -192,7 +192,6 @@ def dataset_gen(
                 "v_len": vfeat_lens[vid],
                 "w_ids": word_ids,
                 "c_ids": char_ids,
-                "annotation_uid": record["annotation_uid"],
                 "query_idx": record["query_idx"],
             }
             worker_dataset.append(result)
