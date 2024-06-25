@@ -114,6 +114,7 @@ def eval_test(
                 new_datum = {
                     "clip_uid": record["vid"],
                     "query_idx": int(record["query_idx"]),
+                    "annotation_uid": record["annotation_uid"],
                     "predicted_times": copy.deepcopy(timewindow_predictions),
                 }
                 predictions.append(new_datum)
