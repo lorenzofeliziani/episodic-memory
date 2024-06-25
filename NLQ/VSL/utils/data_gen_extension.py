@@ -251,7 +251,6 @@ def dataset_gen_bert(data, vfeat_lens, tokenizer, max_pos_len, scope, num_worker
                 "e_ind": int(e_ind),
                 "v_len": vfeat_lens[vid],
                 "w_ids": word_ids,
-                "annotation_uid": record["annotation_uid"],
                 "query_idx": record["query_idx"],
             }
             worker_dataset.append(result)
