@@ -44,7 +44,6 @@ class EpisodicNLQProcessor:
                 data_item["timestamps"],
                 data_item["exact_times"],
                 data_item["sentences"],
-                data_item["annotation_uids"],
                 data_item["query_idx"],
             )
             for timestamp, exact_time, sentence, ann_uid, query_idx in zipper:
@@ -64,7 +63,6 @@ class EpisodicNLQProcessor:
                     "duration": duration,
                     "words": words,
                     "query": sentence.strip().lower(),
-                    "annotation_uid": ann_uid,
                     "query_idx": query_idx,
                 }
                 if (
