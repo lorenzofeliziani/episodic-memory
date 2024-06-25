@@ -110,8 +110,10 @@ def convert_ego4d_dataset(args):
     progress_bar = tqdm.tqdm(all_clip_video_map.items(), desc="Extracting features")
     for clip_uid, (video_uid, start_sec, end_sec) in progress_bar:
         feature_path = os.path.join(args["video_feature_read_path"], f"{video_uid}.pt")
-        feature = torch.load(feature_path)
-
+        try:
+            feature = torch.load(feature_path)
+        except:
+            continue
         # Get the lower frame (start_sec) and upper frame (end_sec) for the clip.
         clip_start = get_nearest_frame(start_sec, math.floor)
         clip_end = get_nearest_frame(end_sec, math.ceil)
