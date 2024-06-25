@@ -221,12 +221,18 @@ def main(configs, parser):
                     if results[0][0] >= best_metric:
                         best_metric = results[0][0]
                         torch.save(
-                            model.state_dict(),
-                            os.path.join(
-                                model_dir,
-                                "{}_{}.t7".format(configs.model_name, global_step),
-                            ),
-                        )
+                                    {
+                                        'model_state_dict': model.state_dict(),
+                                        'optimizer_state_dict': optimizer.state_dict(),
+                                        'scheduler_state_dict': scheduler.state_dict(),
+                                        'epoch': epoch,
+                                        'loss': total_loss,
+                                    },
+                                    os.path.join(
+                                        model_dir,
+                                        "{}_{}.t7".format(configs.model_name, global_step),
+                                    ),
+                                )
                         # only keep the top-3 model checkpoints
                         filter_checkpoints(model_dir, suffix="t7", max_to_keep=3)
                     model.train()
