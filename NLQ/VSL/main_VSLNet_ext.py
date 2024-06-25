@@ -102,6 +102,11 @@ def main(configs, parser):
             configs=configs, word_vectors=dataset.get("word_vector", None)
         ).to(device)
         optimizer, scheduler = build_optimizer_and_scheduler(model, configs=configs)
+        if configs.pretrained.lower()=='true':
+            checkpoint = torch.load(configs.pretrain_path)
+            model.load_state_dict(checkpoint['model_state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
         # start training
         best_metric = -1.0
         score_writer = open(
@@ -216,12 +221,18 @@ def main(configs, parser):
                     if results[0][0] >= best_metric:
                         best_metric = results[0][0]
                         torch.save(
-                            model.state_dict(),
-                            os.path.join(
-                                model_dir,
-                                "{}_{}.t7".format(configs.model_name, global_step),
-                            ),
-                        )
+                                    {
+                                        'model_state_dict': model.state_dict(),
+                                        'optimizer_state_dict': optimizer.state_dict(),
+                                        'scheduler_state_dict': scheduler.state_dict(),
+                                        'epoch': epoch,
+                                        'loss': total_loss,
+                                    },
+                                    os.path.join(
+                                        model_dir,
+                                        "{}_{}.t7".format(configs.model_name, global_step),
+                                    ),
+                                )
                         # only keep the top-3 model checkpoints
                         filter_checkpoints(model_dir, suffix="t7", max_to_keep=3)
                     model.train()
