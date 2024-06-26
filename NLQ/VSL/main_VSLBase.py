@@ -218,7 +218,7 @@ def main(configs, parser):
                             ),
                         )
                         # only keep the top-3 model checkpoints
-                        filter_checkpoints(model_dir, suffix="t7", max_to_keep=3)
+                        filter_checkpoints(model_dir, suffix="t7", max_to_keep=1)
                     model.train()
             
         score_writer.close()
