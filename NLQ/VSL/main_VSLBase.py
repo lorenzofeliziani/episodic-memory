@@ -69,8 +69,11 @@ def main(configs, parser):
             [
                 configs.model_name,
                 configs.task,
-                configs.fv,
+                str(configs.batch_size),
+                str(configs.dim),
+                str(configs.epochs),
                 str(configs.max_pos_len),
+                str(configs.init_lr),
                 configs.predictor,
             ]
         ),
