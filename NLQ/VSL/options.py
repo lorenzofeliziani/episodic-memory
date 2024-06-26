@@ -82,7 +82,7 @@ def read_command_line():
     parser.add_argument("--seed", type=int, default=12345, help="random seed")
     parser.add_argument("--mode", type=str, default="train", help="[train | test]")
     parser.add_argument("--pretrained", type=str, default="false", help="[True|False]")
-    parser.add_argument("--pretrain_path", type=str, default="", help="Path to the weight to pre-train")
+    # parser.add_argument("--pretrain_path", type=str, default="", help="Path to the weight to pre-train")
     parser.add_argument("--epochs", type=int, default=100, help="number of epochs")
     parser.add_argument("--batch_size", type=int, default=32, help="batch size")
     parser.add_argument(
