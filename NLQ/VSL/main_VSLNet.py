@@ -103,7 +103,7 @@ def main(configs, parser):
         ).to(device)
         optimizer, scheduler = build_optimizer_and_scheduler(model, configs=configs)
         if configs.pretrained.lower()=='true':
-            checkpoint = torch.load(configs.pretrain_path)
+            checkpoint = torch.load(os.path.join(model_dir), get_last_checkpoint(model_dir, suffix="t7"))
             model.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
             scheduler.load_state_dict(checkpoint['scheduler_state_dict'])
